@@ -23,3 +23,14 @@ public:
         return str;
     }
 };
+
+int main(int argc, char *argv[])
+{
+    int data;
+
+    cout << "Enter node's 'data'(double): ";
+    cin >> data;
+
+    Node node(data);
+    std::cout << static_cast<std::string>(node) << std::endl;
+}
