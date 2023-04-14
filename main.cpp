@@ -28,16 +28,23 @@ public:
         str += ")";
         return str;
     }
-};
 
-// return a new Node with data being
-// the sum of two input Node's data
-Node node_sum(const Node &node1, const Node &node2)
-{
-    double data = node1.getData() + node2.getData();
-    Node node(data);
-    return node;
-}
+    // sum two Node's data
+    Node node_sum(const Node &node)
+    {
+        double new_data = data + node.getData();
+        Node new_node(new_data);
+        return new_node;
+    }
+
+    // multiply two Node's data
+    Node node_product(const Node &node)
+    {
+        double new_data = data * node.getData();
+        Node new_node(new_data);
+        return new_node;
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -48,7 +55,7 @@ int main(int argc, char *argv[])
 
     Node node1(data);
     Node node2(data);
-    Node node = node_sum(node1, node2);
+    Node node = node1.node_product(node2);
 
     std::cout << static_cast<std::string>(node) << std::endl;
 }
