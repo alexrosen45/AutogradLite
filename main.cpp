@@ -125,6 +125,40 @@ class Matrix {
         }
         return transpose;
     }
+
+    Matrix apply_function_elementwise(const std::function<double(const double&)> &f) {
+        Matrix new_matrix((*this));
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                new_matrix(i, j) = f((*this)(i, j));
+            }
+        }
+        return new_matrix;
+    }
+};
+
+struct matrix {
+    static Matrix randn(size_t num_rows, size_t num_cols) {
+        Matrix M(num_rows, num_cols);
+
+        std::random_device rd{};
+        std::mt19937 gen{rd()};
+
+        // Gaussian distribution with mean = 0
+        // and standard deviation = 1 / sqrt(num_entries)
+
+        double n(M.num_entries);
+        double stdev{1 / sqrt(n)};
+        std::normal_distribution<double> d{0, stdev};
+
+        // fill each element using distribution
+        for (size_t i = 0; i < num_rows; i++){
+            for (size_t j = 0; j < num_cols; j++) {
+                M(i, j) = d(gen);
+            }
+        }
+        return M;
+    }
 };
 
 
