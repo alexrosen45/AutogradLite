@@ -7,6 +7,7 @@
 #include <vector>
 #include <tuple>
 #include <random>
+#include <functional> // enables references to functions as input
 
 using namespace std;
 
@@ -43,6 +44,7 @@ class Matrix {
         size_t num_rows;
         size_t num_cols;
         size_t num_entries;
+        // colums are stacked in order
         std::vector<double> entries;
         std::tuple<size_t, size_t> shape;
 
@@ -56,17 +58,72 @@ class Matrix {
     }
 
     void print() {
-        for (size_t i = 0; i < num_cols; i++) {
-            for (size_t j = 0; j < num_rows; j++) {
-                std::cout << entries[num_rows * i + j] << " ";
+        if (num_rows == 0 && num_cols == 0) {
+            std::cout << "Matrix object is empty\n";
+        }
+        else {
+            for (size_t i = 0; i < num_cols; i++) {
+                for (size_t j = 0; j < num_rows; j++) {
+                    std::cout << entries[num_rows * i + j] << " ";
+                }
+                std::cout << std::endl;
             }
             std::cout << std::endl;
         }
-        std::cout << std::endl;
     }
 
     void print_shape() {
         std::cout << "Matrix(num_rows=" << num_rows << ", num_cols=" << num_cols << ")\n"; 
+    }
+
+    double& operator()(size_t i, size_t j) {
+        // return a reference to the element in the i-th column and j-th row (zero-indexed)
+        return entries[num_rows * i + j];
+    }
+
+    // naive matrix multiplication (change later!!!)
+    Matrix multiply(Matrix &other_matrix) {
+        // assumes num_cols == matrix.num_rows
+        Matrix new_matrix(other_matrix.num_cols, num_rows);
+        for (size_t i = 0; i < new_matrix.num_rows; i++) {
+            for (size_t j = 0; j < new_matrix.num_cols; j++) {
+                for (size_t k = 0; k < other_matrix.num_rows; k ++) {
+                    new_matrix(i, j) += (*this)(j, k) * other_matrix(k, i);
+                }
+            }
+        }
+        return new_matrix;
+    }
+
+    Matrix multiply_elementwise(Matrix &other_matrix) {
+        // assume shape == other_matrix.shape
+        Matrix new_matrix((*this));
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                new_matrix(i, j) = (*this)(i, j) * other_matrix(i, j);
+            }
+        }
+        return new_matrix;
+    }
+
+    Matrix multiply_scalar(double scalar) {
+        Matrix new_matrix((*this));
+        for (size_t i = 0; i < num_rows; i++) {
+            for (size_t j = 0; j < num_cols; j++) {
+                new_matrix(i, j) = (*this)(i, j) * scalar;
+            }
+        }
+        return new_matrix;
+    }
+
+    Matrix transpose() {
+        Matrix transpose(num_cols, num_rows);
+        for (size_t i = 0; i < num_cols; i++) {
+            for (size_t j = 0; j < num_rows; j++) {
+                transpose(i, j) = (*this)(j, i);
+            }
+        }
+        return transpose;
     }
 };
 
