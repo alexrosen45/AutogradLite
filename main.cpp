@@ -138,6 +138,16 @@ class Matrix {
 };
 
 struct matrix {
+    static Matrix ones(size_t num_rows, size_t num_cols) {
+        Matrix M(num_rows, num_cols);
+        for (size_t i = 0; i < num_rows; i++){
+            for (size_t j = 0; j < num_cols; j++) {
+                M(i, j) = 1.0;
+            }
+        }
+        return M;
+    }
+
     static Matrix randn(size_t num_rows, size_t num_cols) {
         Matrix M(num_rows, num_cols);
 
@@ -170,9 +180,9 @@ int main() {
 
     std::cout << sigmoid(loss) << std::endl; // 0.5
 
-    Matrix matrix;
-    matrix.print();
-    matrix.print_shape();
+    auto M = matrix::randn(2, 2);
+    M.print_shape();
+    M.print()
 
     return 0;
 }
