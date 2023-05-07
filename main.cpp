@@ -48,8 +48,8 @@ class Matrix {
         std::vector<double> entries;
         std::tuple<size_t, size_t> shape;
 
-    Matrix(size_t num_rows, size_t num_cols)
-    : num_rows(num_rows), num_cols(num_cols), entries({}) {
+    Matrix(size_t num_rows, size_t num_cols):
+    num_rows(num_rows), num_cols(num_cols), entries({}) {
         entries.resize(num_rows * num_cols);
         shape = {num_rows, num_cols};
     }
@@ -116,6 +116,19 @@ class Matrix {
         return new_matrix;
     }
 
+    Matrix add_elementwise(Matrix &other_matrix) {
+        Matrix new_matrix(num_rows, get<1>(other_matrix.shape));
+        for (size_t i = 0; i < num_rows; ++i) {
+            for (size_t j = 0; j < num_cols; ++j) {
+                new_matrix(i, j) = (*this)(i, j) + other_matrix(i, j);
+            }
+        }
+        return new_matrix;
+    }
+    Matrix operator+(Matrix &other_matrix) {
+        return add_elementwise(other_matrix);
+    }
+
     Matrix transpose() {
         Matrix transpose(num_cols, num_rows);
         for (size_t i = 0; i < num_cols; i++) {
@@ -172,6 +185,43 @@ struct matrix {
 };
 
 
+class MultiLayerPerceptron {
+    public:
+        std::vector<size_t> units_per_layer;
+        std::vector<Matrix> weights;
+        std::vector<Matrix> bias_vectors;
+        std::vector<Matrix> activations;
+        float r; // learning rate
+
+    MultiLayerPerceptron(std::vector<size_t> units_per_layer, float r=.01f):
+    units_per_layer(units_per_layer), weights(), bias_vectors(), activations(), r(r) {
+        for (size_t i = 0; i < units_per_layer.size(); i++) {
+            size_t num_in{units_per_layer[i]};
+            size_t num_out{units_per_layer[i+1]};
+
+            // use random variables from Gaussian distribution to initialize weights and biases
+            auto W = matrix::randn(num_out, num_in);
+            auto b = matrix::randn(num_out, 1);
+
+            weights.push_back(W);
+            bias_vectors.push_back(b);
+
+            activations.resize(units_per_layer.size());
+        }
+    }
+
+    double forward_propagation(Matrix M) {
+        activations[0] = M;
+        Matrix prev(M);
+
+        for (int i = 0; i < units_per_layer.size() - 1; i++) {
+            // output is WX + b for weights W, input X, and bias b
+            Matrix output = (weights[i].multiply(prev)) + bias_vectors[i];
+        }
+    }
+};
+
+
 int main() {
     std::vector<double> y_true = {1, 0, 0, 1};
     std::vector<double> y_pred = {0, 0, 0, 0};
@@ -182,7 +232,7 @@ int main() {
 
     auto M = matrix::randn(2, 2);
     M.print_shape();
-    M.print()
+    M.print();
 
     return 0;
 }
