@@ -129,6 +129,19 @@ class Matrix {
         return add_elementwise(other_matrix);
     }
 
+    Matrix subtract_elementwise(Matrix &other_matrix) {
+        Matrix new_matrix(num_rows, get<1>(other_matrix.shape));
+        for (size_t i = 0; i < num_rows; ++i) {
+            for (size_t j = 0; j < num_cols; ++j) {
+                new_matrix(i, j) = (*this)(i, j) - other_matrix(i, j);
+            }
+        }
+        return new_matrix;
+    }
+    Matrix operator+(Matrix &other_matrix) {
+        return add_elementwise(other_matrix);
+    }
+
     Matrix transpose() {
         Matrix transpose(num_cols, num_rows);
         for (size_t i = 0; i < num_cols; i++) {
