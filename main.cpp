@@ -202,35 +202,42 @@ class MultiLayerPerceptron {
     public:
         std::vector<size_t> units_per_layer;
         std::vector<Matrix> weights;
-        std::vector<Matrix> bias_vectors;
+        std::vector<Matrix> biases;
         std::vector<Matrix> activations;
         float r; // learning rate
 
     MultiLayerPerceptron(std::vector<size_t> units_per_layer, float r=.01f):
-    units_per_layer(units_per_layer), weights(), bias_vectors(), activations(), r(r) {
+    units_per_layer(units_per_layer), weights(), biases(), activations(), r(r) {
         for (size_t i = 0; i < units_per_layer.size(); i++) {
             size_t num_in{units_per_layer[i]};
             size_t num_out{units_per_layer[i+1]};
 
-            // use random variables from Gaussian distribution to initialize weights and biases
-            auto W = matrix::randn(num_out, num_in);
-            auto b = matrix::randn(num_out, 1);
+            // without random variables
+            auto W = matrix::ones(num_out, num_in);
+            auto b = matrix::ones(num_out, 1);
 
             weights.push_back(W);
-            bias_vectors.push_back(b);
+            biases.push_back(b);
 
             activations.resize(units_per_layer.size());
         }
     }
 
-    double forward_propagation(Matrix M) {
+    double forward(Matrix M) {
         activations[0] = M;
         Matrix prev(M);
 
         for (int i = 0; i < units_per_layer.size() - 1; i++) {
-            // output is WX + b for weights W, input X, and bias b
-            Matrix output = (weights[i].multiply(prev)) + bias_vectors[i];
+            // output is f(WX + b) for weights W, input X,
+            // bias b, and activation function f
+            Matrix output = (weights[i].multiply(prev)) + biases[i];
+            output = apply_function_elementwise(sigmoid);
+            
+            prev = output;
+            activations[i+1] = output;
         }
+        // last 'prev' is network output
+        return prev;
     }
 };
 
